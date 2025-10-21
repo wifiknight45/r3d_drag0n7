@@ -5,18 +5,48 @@ r3d_drag0n7 (sistema.py) is a comprehensive astronomical and astrological chart 
 Whether you're an astrology enthusiast, researcher, or developer building astrological applications, r3d_drag0n7 provides the tools you need with intelligent fallbacks and extensive customization options.
 
 ✨ Key Features
-🎯 Core Capabilities
+Key Dependencies:
+Core Astronomical Libraries:
 
-Multi-Mode Computation: Choose between Swiss Ephemeris precision, Skyfield accuracy, or pure-Python fallback
-Intelligent Date Parsing: Handles DD/MM/YYYY and MM/DD/YYYY formats with interactive disambiguation
-Flexible Time Input: Supports 24-hour, 12-hour (AM/PM), timezone abbreviations, IANA timezone names, and UTC offsets
-Smart Location Resolution:
+pyswisseph - High-precision Swiss Ephemeris (Nostradamus mode)
+skyfield - JPL ephemeris fallback (Ptolemy mode)
 
-City/State/Country via Nominatim geocoding
-Direct latitude/longitude coordinates
-US ZIP code lookup (with local fallback database)
-Automatic timezone detection via TimezoneFinder
+Geolocation & Timezone:
 
+geopy - Geocoding via Nominatim
+timezonefinder - Lat/lon to timezone conversion
+
+Date/Time:
+
+python-dateutil - Flexible date parsing
+
+Web & APIs:
+
+requests - HTTP requests for geocoding and Wikipedia events
+
+Visualization:
+
+matplotlib - Static charts
+plotly - Interactive HTML wheels
+Pillow - PNG image generation
+fpdf - PDF report creation
+
+Installation Options:
+Minimal (basic functionality):
+bashpip install pyswisseph skyfield python-dateutil requests
+Recommended (full features):
+bashpip install -r requirements.txt
+With virtual environment (best practice):
+bashpython3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+The file includes detailed notes on:
+
+Platform-specific considerations
+Python version requirements (3.9+)
+Troubleshooting tips
+Mode-specific requirements (Nostradamus/Ptolemy/Paranoid)
+Optional performance enhancements
 
 
 📊 Astronomical Calculations
