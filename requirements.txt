@@ -1,0 +1,127 @@
+# requirements.txt
+# Python dependencies for sistema.py and sistema_enhanced.py
+# Astrological Chart Generator
+
+# ============================================================================
+# CORE ASTRONOMICAL/ASTROLOGICAL LIBRARIES
+# ============================================================================
+
+# Swiss Ephemeris - High precision ephemeris calculations (Nostradamus mode)
+# Provides exact planetary positions and house calculations
+pyswisseph>=2.10.3.2
+
+# Skyfield - JPL ephemeris for astronomical calculations (Ptolemy mode fallback)
+# Pure Python alternative when Swiss Ephemeris unavailable
+skyfield>=1.46
+
+# ============================================================================
+# GEOLOCATION AND TIMEZONE
+# ============================================================================
+
+# Geopy - Geocoding service to convert locations to coordinates
+# Uses Nominatim (OpenStreetMap) for location lookups
+geopy>=2.4.1
+
+# TimezoneFinder - Convert lat/lon coordinates to timezone names
+# Essential for accurate time calculations
+timezonefinder>=6.2.0
+
+# ============================================================================
+# DATE/TIME PARSING
+# ============================================================================
+
+# Python-dateutil - Flexible date/time parsing
+# Handles various date formats and timezone conversions
+python-dateutil>=2.8.2
+
+# ============================================================================
+# WEB REQUESTS AND API ACCESS
+# ============================================================================
+
+# Requests - HTTP library for API calls
+# Used for Nominatim geocoding and Wikipedia OnThisDay events
+requests>=2.31.0
+
+# ============================================================================
+# VISUALIZATION AND OUTPUT
+# ============================================================================
+
+# Matplotlib - Chart and graph creation
+# Used for basic astronomical visualizations
+matplotlib>=3.8.2
+
+# Plotly - Interactive HTML charts
+# Creates interactive wheel charts viewable in browsers
+plotly>=5.18.0
+
+# Pillow (PIL) - Image processing library
+# Creates PNG wheel chart images
+Pillow>=10.1.0
+
+# FPDF - PDF generation
+# Creates formatted PDF reports
+fpdf>=1.7.2
+
+# ============================================================================
+# OPTIONAL DEPENDENCIES
+# ============================================================================
+
+# NumPy - Numerical computing (dependency for many above packages)
+numpy>=1.26.2
+
+# PyYAML - YAML parsing (useful for configuration files)
+# pyyaml>=6.0.1
+
+# ============================================================================
+# INSTALLATION NOTES
+# ============================================================================
+
+# MINIMAL INSTALLATION (basic functionality only):
+# pip install pyswisseph skyfield python-dateutil requests
+
+# RECOMMENDED INSTALLATION (full features):
+# pip install -r requirements.txt
+
+# NOSTRADAMUS MODE (highest accuracy):
+# Requires pyswisseph + ephemeris data files
+# Download Swiss Ephemeris files from: https://www.astro.com/ftp/swisseph/ephe/
+# Place in data/ directory
+
+# PTOLEMY MODE (fallback):
+# Uses skyfield with JPL ephemeris (downloads automatically on first run)
+# Requires internet connection for initial ephemeris download
+
+# PARANOID MODE (offline):
+# Requires pre-downloaded ephemeris files and local data/zipcodes.csv
+# No internet connectivity required after setup
+
+# ============================================================================
+# PLATFORM-SPECIFIC NOTES
+# ============================================================================
+
+# WINDOWS:
+# - May need Microsoft Visual C++ Build Tools for some packages
+# - pyswisseph sometimes requires pre-compiled wheels
+
+# LINUX/MAC:
+# - Should install cleanly with pip
+# - May need python3-dev or python-devel packages
+
+# PYTHON VERSION:
+# - Requires Python 3.9+ (for zoneinfo module)
+# - Tested on Python 3.9, 3.10, 3.11, 3.12
+
+# ============================================================================
+# TROUBLESHOOTING
+# ============================================================================
+
+# If pyswisseph fails to install:
+# 1. Try: pip install --upgrade pip setuptools wheel
+# 2. Download pre-built wheel from: https://pypi.org/project/pyswisseph/
+# 3. Or use Ptolemy mode (skyfield only) - still very accurate
+
+# If timezonefinder is slow:
+# - Consider installing: timezonefinder[numba] for JIT compilation speedup
+
+# For development/testing:
+# pip install pytest pytest-cov black flake8 mypy
