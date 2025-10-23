@@ -1,6 +1,7 @@
 # requirements.txt
-# Python dependencies for sistema.py and sistema_enhanced.py
+# Python dependencies for sistema_completa.py
 # Astrological Chart Generator
+# Requires Python 3.9+ (or 3.8 with backports.zoneinfo)
 
 # ============================================================================
 # CORE ASTRONOMICAL/ASTROLOGICAL LIBRARIES
@@ -8,10 +9,12 @@
 
 # Swiss Ephemeris - High precision ephemeris calculations (Nostradamus mode)
 # Provides exact planetary positions and house calculations
+# Note: Requires ~100MB ephemeris data files (separate download)
 pyswisseph>=2.10.3.2
 
 # Skyfield - JPL ephemeris for astronomical calculations (Ptolemy mode fallback)
 # Pure Python alternative when Swiss Ephemeris unavailable
+# First run downloads DE421 ephemeris (~17MB)
 skyfield>=1.46
 
 # ============================================================================
@@ -26,13 +29,21 @@ geopy>=2.4.1
 # Essential for accurate time calculations
 timezonefinder>=6.2.0
 
+# Numba - JIT compiler for performance boost (optional but recommended)
+# Significantly speeds up timezonefinder lookups
+numba>=0.58.1
+
 # ============================================================================
-# DATE/TIME PARSING
+# DATE/TIME PARSING AND TIMEZONE SUPPORT
 # ============================================================================
 
 # Python-dateutil - Flexible date/time parsing
 # Handles various date formats and timezone conversions
 python-dateutil>=2.8.2
+
+# Backports of zoneinfo for Python < 3.9
+# Required for Python 3.8 and earlier
+backports.zoneinfo>=0.2.1; python_version < '3.9'
 
 # ============================================================================
 # WEB REQUESTS AND API ACCESS
@@ -58,70 +69,142 @@ plotly>=5.18.0
 # Creates PNG wheel chart images
 Pillow>=10.1.0
 
-# FPDF - PDF generation
+# FPDF2 - PDF generation (modern maintained fork)
 # Creates formatted PDF reports
-fpdf>=1.7.2
+# Note: Using fpdf2 instead of deprecated fpdf 1.7.2
+fpdf2>=2.7.6
 
 # ============================================================================
-# OPTIONAL DEPENDENCIES
+# NUMERICAL COMPUTING (dependencies for above packages)
 # ============================================================================
 
-# NumPy - Numerical computing (dependency for many above packages)
+# NumPy - Numerical computing foundation
+# Required by matplotlib, skyfield, and other packages
 numpy>=1.26.2
 
-# PyYAML - YAML parsing (useful for configuration files)
-# pyyaml>=6.0.1
+# ============================================================================
+# OPTIONAL DEVELOPMENT DEPENDENCIES
+# ============================================================================
+
+# Uncomment for development/testing:
+# pytest>=7.4.3
+# pytest-cov>=4.1.0
+# black>=23.12.0
+# flake8>=6.1.0
+# mypy>=1.7.1
 
 # ============================================================================
-# INSTALLATION NOTES
+# INSTALLATION INSTRUCTIONS
 # ============================================================================
+
+# QUICK START (all features):
+#   pip install -r requirements.txt
 
 # MINIMAL INSTALLATION (basic functionality only):
-# pip install pyswisseph skyfield python-dateutil requests
+#   pip install pyswisseph skyfield python-dateutil requests
 
-# RECOMMENDED INSTALLATION (full features):
-# pip install -r requirements.txt
+# LIGHTWEIGHT (no visualization):
+#   pip install pyswisseph skyfield python-dateutil requests geopy timezonefinder
+
+# ============================================================================
+# MODE-SPECIFIC REQUIREMENTS
+# ============================================================================
 
 # NOSTRADAMUS MODE (highest accuracy):
-# Requires pyswisseph + ephemeris data files
-# Download Swiss Ephemeris files from: https://www.astro.com/ftp/swisseph/ephe/
-# Place in data/ directory
+#   Requires: pyswisseph + Swiss Ephemeris data files
+#   Download ephemeris files from: https://www.astro.com/ftp/swisseph/ephe/
+#   Required files: seas_18.se1, semo_18.se1, sepl_18.se1 (or newer)
+#   Place in: data/ directory
+#   Total size: ~100MB
 
-# PTOLEMY MODE (fallback):
-# Uses skyfield with JPL ephemeris (downloads automatically on first run)
-# Requires internet connection for initial ephemeris download
+# PTOLEMY MODE (fallback, still accurate):
+#   Requires: skyfield (auto-downloads JPL DE421 ephemeris on first run)
+#   Initial download: ~17MB
+#   No manual ephemeris setup needed
 
-# PARANOID MODE (offline):
-# Requires pre-downloaded ephemeris files and local data/zipcodes.csv
-# No internet connectivity required after setup
+# PARANOID MODE (completely offline):
+#   Requires: Pre-downloaded ephemeris files + data/zipcodes.csv
+#   Setup: Download all files before use, disable internet access
+#   Uses: Local geocoding and cached event data
 
 # ============================================================================
 # PLATFORM-SPECIFIC NOTES
 # ============================================================================
 
 # WINDOWS:
-# - May need Microsoft Visual C++ Build Tools for some packages
-# - pyswisseph sometimes requires pre-compiled wheels
+#   - May need Microsoft Visual C++ Build Tools for compilation
+#   - If pyswisseph fails, download pre-compiled wheel from:
+#     https://github.com/astrorigin/pyswisseph/releases
+#   - Or use: pip install pyswisseph --only-binary :all:
 
-# LINUX/MAC:
-# - Should install cleanly with pip
-# - May need python3-dev or python-devel packages
+# LINUX:
+#   - May need: sudo apt-get install python3-dev (Debian/Ubuntu)
+#   - Or: sudo yum install python3-devel (RedHat/CentOS)
 
-# PYTHON VERSION:
-# - Requires Python 3.9+ (for zoneinfo module)
-# - Tested on Python 3.9, 3.10, 3.11, 3.12
+# MACOS:
+#   - Should work with standard pip install
+#   - XCode Command Line Tools may be needed: xcode-select --install
+
+# ============================================================================
+# PYTHON VERSION COMPATIBILITY
+# ============================================================================
+
+# SUPPORTED VERSIONS:
+#   - Python 3.9+: Full support (recommended)
+#   - Python 3.8: Supported with backports.zoneinfo
+#   - Python 3.7 and below: NOT SUPPORTED
+
+# TO-BE TESTED ON:
+#   - Python 3.9.x ✓
+#   - Python 3.10.x ✓
+#   - Python 3.11.x ✓
+#   - Python 3.12.x ✓
 
 # ============================================================================
 # TROUBLESHOOTING
 # ============================================================================
 
-# If pyswisseph fails to install:
-# 1. Try: pip install --upgrade pip setuptools wheel
-# 2. Download pre-built wheel from: https://pypi.org/project/pyswisseph/
-# 3. Or use Ptolemy mode (skyfield only) - still very accurate
+# Problem: pyswisseph won't compile
+# Solution 1: pip install --upgrade pip setuptools wheel
+# Solution 2: pip install pyswisseph --only-binary :all:
+# Solution 3: Use Ptolemy mode instead (still very accurate)
 
-# If timezonefinder is slow:
-# - Consider installing: timezonefinder[numba] for JIT compilation speedup
+# Problem: timezonefinder is slow
+# Solution: pip install numba (enables JIT compilation)
 
-# For development/testing:
-# pip install pytest pytest-cov black flake8 mypy
+# Problem: Import errors after installation
+# Solution: python -m pip install --force-reinstall -r requirements.txt
+
+# Problem: PDF generation fails with encoding errors
+# Solution: Ensure you're using fpdf2, not fpdf 1.7.2
+
+# Problem: Skyfield can't download ephemeris
+# Solution: Pre-download DE421 from https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/
+#           Place in ~/.local/share/skyfield/ (Linux/Mac) or %LOCALAPPDATA%\skyfield\ (Windows)
+
+# ============================================================================
+# PACKAGE SIZES (approximate)
+# ============================================================================
+
+# Install size breakdown:
+#   pyswisseph: ~5MB (+ 100MB ephemeris data if using Nostradamus mode)
+#   skyfield: ~2MB (+ 17MB DE421 ephemeris auto-downloaded)
+#   matplotlib: ~50MB
+#   plotly: ~30MB
+#   Other packages: ~20MB
+#   Total: ~110-200MB depending on mode
+
+# ============================================================================
+# SECURITY NOTES
+# ============================================================================
+
+# External Network Requests:
+#   - Nominatim (OpenStreetMap) for geocoding
+#   - Wikipedia OnThisDay API for historical events
+#   - JPL for Skyfield ephemeris download (first run only)
+#
+# To run completely offline (Paranoid mode):
+#   1. Install all packages
+#   2. Pre-download ephemeris files
+#   3. Create data/zipcodes.csv for geocoding
+#   4. Disable network or use --mode Paranoid flag
