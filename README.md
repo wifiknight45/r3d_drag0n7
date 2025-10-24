@@ -90,7 +90,7 @@ pip install skyfield
 The easiest way to use the system:
 
 ```bash
-python sistema_complete.py --interactive
+python sistema_completa.py --interactive
 ```
 
 Follow the prompts to enter birth date, time, location, and preferences.
@@ -100,7 +100,7 @@ Follow the prompts to enter birth date, time, location, and preferences.
 For automated or scripted usage:
 
 ```bash
-python sistema_complete.py --date "15/08/1990" --time "14:30 PST" --location "San Francisco, CA"
+python sistema_completa.py --date "15/08/1990" --time "14:30 PST" --location "San Francisco, CA"
 ```
 
 ### CLI Arguments
