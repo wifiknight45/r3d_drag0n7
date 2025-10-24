@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-sistema_complete.py
+sistema_completa.py
 
 Complete astrological and astronomical chart generator with detailed interpretations.
 
