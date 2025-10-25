@@ -7,7 +7,8 @@
 ![Outputs](https://img.shields.io/badge/output-txt%20%7C%20json%20%7C%20png%20%7C%20html%20%7C%20pdf-informational)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
-# r3d_drag0n7
+# r3d_drag0n7 is under dev, check back for updates etc. 
+
 a script of astral systems
 
 r3d_drag0n7 (sistema.py) is a comprehensive astronomical and astrological chart generation tool that combines professional-grade ephemeris calculations with flexible input parsing and rich visualization capabilities. Designed as a single-file solution, it offers three distinct computation modes to balance accuracy, dependency requirements, and offline capability.
