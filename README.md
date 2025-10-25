@@ -227,7 +227,7 @@ All output files are saved to the `outputs/` directory:
 
 ## Project Structure
 
-### Recommended Directory Structure
+### Potential Directory Structure
 
 ```
 astrological-chart-generator/
