@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>r3d_drag0n7</title>
+  <meta name="description" content="Astral chart studio — minimal celestial engine." />
+  <link rel="icon" href="dragon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="logo" href="/">
+      <img src="dragon.svg" width="40" height="40" alt="" />
+      <span>r3d_drag0n7</span>
+    </a>
+    <a class="gh" href="https://github.com/wifiknight45/r3d_drag0n7">GitHub</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img class="mark" src="dragon.svg" width="160" height="160" alt="Dragon mark" />
+      <h1>r3d_drag0n7</h1>
+      <p class="tag">astral systems · chart engine</p>
+    </section>
+
+    <section class="cast">
+      <form id="chartForm">
+        <input name="name" placeholder="Name" autocomplete="name" />
+        <input name="date" type="date" required />
+        <input name="time" type="time" value="12:00" required />
+        <input name="place" placeholder="Place or ZIP" required />
+        <select name="mode">
+          <option>Nostradamus</option>
+          <option>Ptolemy</option>
+          <option>Paranoid</option>
+        </select>
+        <select name="houses">
+          <option>Placidus</option>
+          <option>Whole Sign</option>
+          <option>Equal</option>
+          <option>Porphyry</option>
+          <option>Campanus</option>
+        </select>
+        <button type="submit">cast</button>
+      </form>
+      <pre id="out" hidden></pre>
+    </section>
+  </main>
+
+  <footer>
+    <span>run engine: <code>uvicorn web.app:app --port 7860</code></span>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+:root {
+  --bg: #0a0a0a;
+  --fg: #e8e8e8;
+  --muted: #8a8a8a;
+  --red: #c0101a;
+  --panel: #111;
+  --line: #222;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+}
+a { color: var(--red); text-decoration: none; }
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.logo { display: flex; align-items: center; gap: 0.6rem; color: var(--fg); font-weight: 700; letter-spacing: 0.04em; }
+.logo img { border-radius: 6px; }
+.gh { color: var(--muted); font-size: 0.9rem; }
+.gh:hover { color: var(--red); }
+main { flex: 1; width: min(520px, 100%); margin: 0 auto; padding: 2.5rem 1.25rem 3rem; }
+.hero { text-align: center; margin-bottom: 2rem; }
+.mark {
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  margin-bottom: 1rem;
+}
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+.tag { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.9rem; }
+.cast {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+}
+form { display: grid; gap: 0.55rem; }
+input, select, button {
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: #0d0d0d;
+  color: var(--fg);
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+}
+input:focus, select:focus { outline: 1px solid var(--red); border-color: var(--red); }
+button {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.08); }
+#out {
+  margin: 0.9rem 0 0;
+  padding: 0.75rem;
+  background: #0d0d0d;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.78rem;
+  color: var(--muted);
+  max-height: 320px;
+}
+footer {
+  border-top: 1px solid var(--line);
+  padding: 0.9rem 1.25rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+code { color: var(--fg); }
