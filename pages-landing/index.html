@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>r3d_drag0n7 — Astral Dragon</title>
+  <meta name="description" content="Celestial Chinese-dragon birth charts. Run the local API for full compute." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="sky" aria-hidden="true"><div class="stars"></div><div class="nebula"></div></div>
+  <header class="nav">
+    <div class="brand"><span class="glyph">🐉</span> r3d_drag0n7</div>
+    <nav>
+      <a href="#run">Run locally</a>
+      <a href="#modes">Modes</a>
+      <a class="btn btn-small" href="https://github.com/wifiknight45/r3d_drag0n7">GitHub</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">墨龙 · a script of astral systems</p>
+      <h1>Celestial charts. Red-gold dragon ink.</h1>
+      <p class="lede">
+        Professional-grade natal compute (Swiss Ephemeris / Skyfield / offline) with a Dragon Studio web UI.
+        This GitHub Pages site is the landing — full interactive casting needs the local API.
+      </p>
+      <div class="cta-row">
+        <a class="btn" href="https://github.com/wifiknight45/r3d_drag0n7#readme">Docs on GitHub</a>
+        <a class="btn btn-ghost" href="#run">How to run</a>
+      </div>
+      <p class="note banner">Pages hosts the brand landing only. Clone the repo and start <code>uvicorn web.app:app</code> for live charts + AI hooks.</p>
+    </section>
+
+    <section class="grid">
+      <article><h2>Dragon Studio</h2><p>Dark-sky UI with Chinese dragon motifs. Form → loading coil → placements, summary, SVG wheel.</p></article>
+      <article><h2>Three modes</h2><p>Nostradamus (Swiss), Ptolemy (Skyfield), Paranoid (offline). House systems: Placidus, Equal, Whole, Porphyry, Campanus.</p></article>
+      <article><h2>AI hooks</h2><p>Optional natal enrichment via <code>OPENAI_API_KEY</code> / <code>PERPLEXITY_API_KEY</code>, or local heuristic rewrite.</p></article>
+      <article><h2>CLI + library</h2><p>Keep using <code>sistema_enhanced.py</code> from the terminal; the web layer imports it carefully without rewriting the engine.</p></article>
+    </section>
+
+    <section id="modes" class="panel">
+      <h2>Computation modes</h2>
+      <ul class="modes">
+        <li><strong>Nostradamus</strong> — high-accuracy Swiss Ephemeris</li>
+        <li><strong>Ptolemy</strong> — Skyfield fallback</li>
+        <li><strong>Paranoid</strong> — offline-leaning operation</li>
+      </ul>
+    </section>
+
+    <section id="run" class="panel">
+      <h2>Run Dragon Studio</h2>
+      <pre><code>git clone https://github.com/wifiknight45/r3d_drag0n7.git
+cd r3d_drag0n7
+pip install -r requirements-web.txt
+# optional: pip install skyfield pyswisseph geopy timezonefinder requests
+uvicorn web.app:app --reload --port 7860</code></pre>
+      <p class="note">Then open <strong>http://127.0.0.1:7860</strong> — see <code>web/README.md</code> and <code>docs/AI_ENHANCEMENTS.md</code>.</p>
+    </section>
+  </main>
+  <footer>
+    <p>MIT · <a href="https://github.com/wifiknight45/r3d_drag0n7">wifiknight45/r3d_drag0n7</a></p>
+  </footer>
+</body>
+</html>
