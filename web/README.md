@@ -1,22 +1,14 @@
 # r3d_drag0n7 Web App
 
-Celestial Chinese-dragon UI that runs birth charts via the local sistema engine.
+Celestial Chinese-dragon UI that runs birth charts via the canonical `r3d_dragon` engine
+(`sistema.py` / `python -m r3d_dragon`).
 
 ## Quick start
 
 From the repository root:
 
-```
-pip install fastapi uvicorn
-uvicorn web.app:app --reload --port 7860
-```
-
-Or with the pinned web extras:
-
-```
-pip install -r requirements-web.txt
-# optional ephemeris backends (recommended):
-pip install skyfield pyswisseph geopy timezonefinder requests python-dateutil
+```bash
+pip install -r requirements.txt -r requirements-web.txt
 uvicorn web.app:app --reload --port 7860
 ```
 
@@ -24,10 +16,9 @@ Open http://127.0.0.1:7860
 
 ## API
 
-- `POST /api/chart` — compute natal chart JSON
-- `POST /api/ai/reading` — AI enrichment (templated / heuristic unless `OPENAI_API_KEY` or `PERPLEXITY_API_KEY` is set)
-- `GET /` — static frontend
-- `GET /api/health` — backend + sistema status
+- `POST /api/chart` — compute natal chart JSON (calls `r3d_dragon.chart.generate_chart`)
+- `GET /` — static frontend when `web/static/index.html` is present
+- `GET /api/health` — backend + ephemeris status
 
 ## Chart request body
 
@@ -36,10 +27,8 @@ Open http://127.0.0.1:7860
   "name": "Ada",
   "date": "1815-12-10",
   "time": "14:30",
-  "place": "London, UK",
-  "lat": null,
-  "lon": null,
-  "timezone": "Europe/London",
+  "place": "10001",
+  "timezone": "America/New_York",
   "house_system": "Placidus",
   "mode": "Ptolemy"
 }
@@ -47,6 +36,4 @@ Open http://127.0.0.1:7860
 
 Modes: `Nostradamus` | `Ptolemy` | `Paranoid`. House systems: `Placidus`, `Equal`, `Whole`, `Porphyry`, `Campanus`.
 
-## Notes
-
-GitHub Pages hosts the landing page only; full chart compute needs this local API.
+Paranoid mode refuses network geocode and Skyfield downloads; use US zip or lat,lon plus local ephemeris.

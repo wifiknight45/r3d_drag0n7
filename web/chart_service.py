@@ -1,6 +1,6 @@
 """
-Chart computation service — imports the canonical sistema modules carefully.
-Does not rewrite sistema_enhanced; wraps calls and returns API-friendly JSON.
+Chart computation service — prefers the canonical r3d_dragon package.
+Falls back to archived single-file modules only if the package is unavailable.
 """
 from __future__ import annotations
 
@@ -57,15 +57,24 @@ def _try_load_sistema():
     global _sistema, _sistema_name, _sistema_error
     if _sistema is not None or _sistema_error is not None:
         return _sistema
-    for mod_name in ("sistema_enhanced", "sistema_completa", "sistema"):
+    # Prefer package, then thin sistema wrapper, then archived legacy modules.
+    candidates = (
+        "r3d_dragon",
+        "sistema",
+        "archive.sistema_enhanced",
+        "archive.sistema_completa",
+    )
+    errors = []
+    for mod_name in candidates:
         try:
             _sistema = importlib.import_module(mod_name)
             _sistema_name = mod_name
             _sistema_error = None
             return _sistema
         except Exception as exc:
-            _sistema_error = f"{mod_name}: {exc}"
+            errors.append(f"{mod_name}: {exc}")
             continue
+    _sistema_error = "; ".join(errors) if errors else "no module"
     return None
 
 
@@ -77,8 +86,18 @@ def sistema_status() -> Dict[str, Any]:
         "error": _sistema_error if mod is None else None,
     }
     if mod is not None:
-        info["has_swisseph"] = bool(getattr(mod, "HAS_PYSWISSEPH", False))
-        info["has_skyfield"] = bool(getattr(mod, "HAS_SKYFIELD", False))
+        has_swe = getattr(mod, "HAS_PYSWISSEPH", None)
+        has_sf = getattr(mod, "HAS_SKYFIELD", None)
+        if has_swe is None and _sistema_name == "r3d_dragon":
+            try:
+                from r3d_dragon import deps as _deps
+                has_swe = _deps.HAS_PYSWISSEPH
+                has_sf = _deps.HAS_SKYFIELD
+            except Exception:
+                has_swe, has_sf = False, False
+        info["has_swisseph"] = bool(has_swe)
+        info["has_skyfield"] = bool(has_sf)
+        info["version"] = getattr(mod, "__version__", None)
     return info
 
 
@@ -310,16 +329,26 @@ def compute_with_sistema(
             astro = {"error": f"swisseph failed: {exc}"}
     if (not astro.get("planets")) and prefer_sky and mode.lower() != "paranoid":
         try:
-            astro = mod.compute_planet_positions_skyfield(dt_utc, lat, lon)
+            try:
+                astro = mod.compute_planet_positions_skyfield(dt_utc, lat, lon, allow_download=True)
+            except TypeError:
+                astro = mod.compute_planet_positions_skyfield(dt_utc, lat, lon)
             backend = "skyfield"
         except Exception as exc:
             if not astro:
                 astro = {"error": f"skyfield failed: {exc}"}
     if not astro.get("planets"):
-        # Paranoid / offline or no libs
+        # Paranoid / offline: only local ephemeris (no Skyfield download)
         try:
             if hasattr(mod, "compute_planet_positions_skyfield") and getattr(mod, "HAS_SKYFIELD", False):
-                astro = mod.compute_planet_positions_skyfield(dt_utc, lat, lon)
+                try:
+                    astro = mod.compute_planet_positions_skyfield(
+                        dt_utc, lat, lon, allow_download=(mode.lower() != "paranoid")
+                    )
+                except TypeError:
+                    if mode.lower() == "paranoid":
+                        raise
+                    astro = mod.compute_planet_positions_skyfield(dt_utc, lat, lon)
                 backend = "skyfield"
         except Exception:
             pass
@@ -343,13 +372,18 @@ def build_houses(astro: Dict[str, Any], house_system: str, lat: float, lon: floa
         for cand in (key, "Placidus", "Equal"):
             block = astro["houses"].get(cand) or astro["houses"].get(cand.replace(" ", ""))
             if block and "cusps" in block:
-                cusps = list(block["cusps"])[:12]
+                raw_cusps = list(block["cusps"])
+                if len(raw_cusps) == 13:
+                    raw_cusps = raw_cusps[1:13]
+                cusps = raw_cusps[:12]
                 if len(cusps) >= 12:
+                    asc_v = block.get("asc", block.get("ascendant", cusps[0]))
+                    mc_v = block.get("mc", block.get("MC", cusps[9] if len(cusps) > 9 else 0))
                     return {
                         "system": cand,
                         "cusps": [float(c) for c in cusps],
-                        "ascendant": float(block.get("ascendant", cusps[0])),
-                        "mc": float(block.get("mc", cusps[9] if len(cusps) > 9 else 0)),
+                        "ascendant": float(asc_v),
+                        "mc": float(mc_v),
                     }
 
     asc, mc = approximate_asc_mc(jd, lat, lon)
@@ -522,7 +556,13 @@ def run_chart(payload: Dict[str, Any]) -> Dict[str, Any]:
                 planets_interp = interpreter.interpret_planets_and_aspects(astro)
                 patterns_interp = interpreter.interpret_chart_patterns(astro)
                 # houses_interp may need cusps dict keyed by system
-                cusps_map = {houses["system"]: houses["cusps"]}
+                cusps_map = {
+                    houses["system"]: {
+                        "cusps": houses["cusps"],
+                        "asc": houses.get("ascendant"),
+                        "mc": houses.get("mc"),
+                    }
+                }
                 houses_interp = ""
                 if hasattr(interpreter, "interpret_houses"):
                     try:
