@@ -12,6 +12,7 @@ from .config import (
     DATA_DIR,
     EVENTS_CACHE,
     OUT_ASTRO_RAW,
+    OUT_HOROSCOPE,
     OUT_INTERPRETATION,
     OUT_PDF,
     OUT_SUMMARY,
@@ -264,11 +265,15 @@ def generate_chart(
     patterns_interp = interpreter.interpret_chart_patterns(astro)
     houses_interp = interpreter.interpret_houses(astro, cusps)
     synthesis = interpreter.generate_synthesis(astro, cusps)
-    full_interp = "\n".join([planets_interp, patterns_interp, houses_interp, synthesis])
+    horoscope = interpreter.generate_detailed_horoscope(astro, cusps, name=geo_display)
+    full_interp = "\n".join(
+        [planets_interp, patterns_interp, houses_interp, synthesis, "", horoscope]
+    )
 
     write_text_file(OUT_VERBOSE, "\n".join(verbose_lines))
     write_text_file(OUT_SUMMARY, "\n".join(summary_lines + [""] + event_lines))
     write_text_file(OUT_INTERPRETATION, full_interp)
+    write_text_file(OUT_HOROSCOPE, horoscope)
 
     payload = {
         "input": {
@@ -307,6 +312,7 @@ def generate_chart(
     print(" - Verbose chart:", OUT_VERBOSE)
     print(" - Summary:", OUT_SUMMARY)
     print(" - Interpretation:", OUT_INTERPRETATION)
+    print(" - Detailed horoscope:", OUT_HOROSCOPE)
     print(" - Raw astro JSON:", OUT_ASTRO_RAW)
     print(" - Wheel PNG (if PIL available):", OUT_WHEEL_PNG)
     print(" - Wheel interactive HTML (if Plotly available):", OUT_WHEEL_HTML)

@@ -69,6 +69,21 @@ uvicorn web.app:app --reload --port 7860
 
 See [`web/README.md`](web/README.md). GitHub Pages (if used) is landing-only; chart compute needs this API or the CLI.
 
+
+## Chart outputs
+
+After a successful run, files land in `outputs/`:
+
+| File | Contents |
+|------|----------|
+| `chart_summary.txt` | Planet placements + sample historical events |
+| `chart_verbose.txt` | Full technical dump |
+| `chart_interpretation.txt` | Planets, patterns, houses, synthesis **+** detailed natal horoscope |
+| `chart_horoscope.txt` | Standalone detailed horoscope (Big Three, love, career, money, mind, care, growth) |
+| `astro_data_raw.json` | Machine-readable chart payload |
+| `int_chart_wheel.png` / `chart_wheel.html` | Wheel visuals (optional deps) |
+| `chart_report.pdf` | PDF if `fpdf` is installed |
+
 ## Tests
 
 ```bash

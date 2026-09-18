@@ -1,7 +1,7 @@
 """Chart interpretation with unified cusp shape support."""
 from __future__ import annotations
 
-from .knowledge import AstrologicalKnowledge, RULERS, SIGNS
+from .knowledge import AstrologicalKnowledge, RULERS, SIGNS, PLANETS
 from .houses import get_placidus_cusps, normalize_cusp_system
 
 
@@ -292,5 +292,172 @@ class ChartInterpreter:
         lines.append("- Using your natural gifts in service of something greater than ego")
         lines.append("- Integrating opposites and finding your unique synthesis")
         
+        return "\n".join(lines)
+
+
+    @staticmethod
+    def generate_detailed_horoscope(astro_data, cusps, name: str | None = None):
+        """Detailed natal horoscope: personality, love, career, money, health, growth."""
+        planets = astro_data.get("planets", {}) or {}
+        who = (name or "You").strip() or "You"
+        lines: list[str] = []
+        lines.append("=" * 80)
+        lines.append(f"DETAILED NATAL HOROSCOPE — {who}")
+        lines.append("=" * 80)
+        lines.append(
+            "Educational astrology narrative grounded on computed placements. "
+            "Not medical, legal, or financial advice."
+        )
+
+        def _p(pname: str):
+            pdata = planets.get(pname) or {}
+            if isinstance(pdata, dict) and "ecl_lon" in pdata:
+                sign, deg = sign_from_degree(pdata["ecl_lon"])
+                return sign, deg, pdata
+            return None, None, None
+
+        sun_sign, sun_deg, _ = _p("Sun")
+        moon_sign, moon_deg, _ = _p("Moon")
+        merc_sign, _, _ = _p("Mercury")
+        venus_sign, _, _ = _p("Venus")
+        mars_sign, _, _ = _p("Mars")
+        jup_sign, _, _ = _p("Jupiter")
+        sat_sign, _, _ = _p("Saturn")
+
+        plac = normalize_cusp_system(cusps.get("Placidus")) if cusps else None
+        asc_sign = asc_deg = None
+        if plac and plac.get("cusps"):
+            asc = plac["asc"] if plac.get("asc") is not None else plac["cusps"][0]
+            asc_sign, asc_deg = sign_from_degree(asc)
+
+        # —— Big three ——
+        lines.append("\n" + "-" * 80)
+        lines.append("1) THE BIG THREE — who you are")
+        lines.append("-" * 80)
+        if sun_sign:
+            info = AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(sun_sign, {})
+            lines.append(f"\nSUN in {sun_sign} ({sun_deg:.1f}°)")
+            lines.append(f"  Element / quality: {info.get('element', '?')} · {info.get('quality', '?')}")
+            lines.append(f"  Keywords: {', '.join(info.get('keywords', [])[:6])}")
+            lessons = info.get('life_lessons') or []
+            lines.append(f"  Life lessons: {', '.join(lessons[:4]) if lessons else 'self-expression'}")
+            if info.get('short_description'):
+                lines.append(f"  Snapshot: {info['short_description']}")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(sun_sign, "Sun"))
+        if moon_sign:
+            info = AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(moon_sign, {})
+            lines.append(f"\nMOON in {moon_sign} ({moon_deg:.1f}°)")
+            lines.append(f"  Emotional climate: {', '.join(info.get('keywords', [])[:5])}")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(moon_sign, "Moon"))
+        if asc_sign:
+            info = AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(asc_sign, {})
+            lines.append(f"\nRISING (Ascendant) in {asc_sign} ({asc_deg:.1f}°)")
+            lines.append(f"  First impression / life approach: {', '.join(info.get('keywords', [])[:5])}")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(asc_sign, "Ascendant"))
+
+        # —— Love ——
+        lines.append("\n" + "-" * 80)
+        lines.append("2) LOVE & RELATIONSHIPS")
+        lines.append("-" * 80)
+        if venus_sign:
+            lines.append(f"\nVenus in {venus_sign} — affection, attraction, aesthetics")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(venus_sign, "Venus"))
+            lines.append(
+                f"  In romance, {who} tends to give and receive love through {venus_sign} themes: "
+                f"{', '.join(AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(venus_sign, {}).get('keywords', ['connection'])[:4])}."
+            )
+        if mars_sign:
+            lines.append(f"\nMars in {mars_sign} — desire, chemistry, conflict style")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(mars_sign, "Mars"))
+        if moon_sign and venus_sign:
+            lines.append(
+                f"\nHeart note: Moon ({moon_sign}) + Venus ({venus_sign}) describe the private need vs the "
+                f"social charm of relating — notice where they agree and where they tension."
+            )
+
+        # —— Career ——
+        lines.append("\n" + "-" * 80)
+        lines.append("3) CAREER, AMBITION & PURPOSE")
+        lines.append("-" * 80)
+        if sun_sign:
+            careers = AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(sun_sign, {}).get("career_paths") or \
+                      AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(sun_sign, {}).get("careers") or []
+            if careers:
+                lines.append(f"\nSun-path career flavors ({sun_sign}): {', '.join(careers[:8])}")
+            else:
+                lines.append(f"\nSun in {sun_sign} points vocation toward that sign's mastery arena.")
+        if mars_sign:
+            lines.append(f"Mars in {mars_sign} shows how {who} fights for goals and initiates projects.")
+        if sat_sign:
+            lines.append(f"Saturn in {sat_sign} — long game, responsibility, mastery curve.")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(sat_sign, "Saturn"))
+        if jup_sign:
+            lines.append(f"Jupiter in {jup_sign} — growth, luck, teaching/expansion style.")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(jup_sign, "Jupiter"))
+
+        # —— Money ——
+        lines.append("\n" + "-" * 80)
+        lines.append("4) MONEY, VALUES & RESOURCES")
+        lines.append("-" * 80)
+        if venus_sign:
+            lines.append(
+                f"Venus in {venus_sign} flavors what feels valuable — spending, collecting, and "
+                f"negotiating often follow this sign's taste."
+            )
+        # 2nd house cusp if available
+        if plac and plac.get("cusps") and len(plac["cusps"]) >= 2:
+            s2, d2 = sign_from_degree(plac["cusps"][1])
+            lines.append(f"2nd-house cusp in {s2} ({d2:.1f}°) — money/values house tone.")
+            lines.append(AstrologicalKnowledge.get_house_interpretation(2))
+        if plac and plac.get("cusps") and len(plac["cusps"]) >= 8:
+            s8, d8 = sign_from_degree(plac["cusps"][7])
+            lines.append(f"8th-house cusp in {s8} ({d8:.1f}°) — shared resources / deeper bonds.")
+
+        # —— Mind ——
+        lines.append("\n" + "-" * 80)
+        lines.append("5) MIND & COMMUNICATION")
+        lines.append("-" * 80)
+        if merc_sign:
+            lines.append(f"Mercury in {merc_sign} — thinking, learning, talking.")
+            lines.append(AstrologicalKnowledge.get_sign_interpretation(merc_sign, "Mercury"))
+
+        # —— Wellness ——
+        lines.append("\n" + "-" * 80)
+        lines.append("6) BODY, NERVOUS SYSTEM & CARE (symbolic)")
+        lines.append("-" * 80)
+        lines.append("Symbolic only — not medical advice.")
+        if sun_sign:
+            body = AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(sun_sign, {}).get("body_parts") or []
+            if body:
+                lines.append(f"Sun/{sun_sign} traditional body focus: {', '.join(body[:6])}")
+        if moon_sign:
+            lines.append(f"Moon in {moon_sign}: honor emotional rhythms; rest when the {moon_sign} instinct asks for safety.")
+        if mars_sign:
+            lines.append(f"Mars in {mars_sign}: channel heat through movement that matches this sign — avoid bottled friction.")
+
+        # —— Growth ——
+        lines.append("\n" + "-" * 80)
+        lines.append("7) GROWTH EDGE & PRACTICAL GUIDANCE")
+        lines.append("-" * 80)
+        if sat_sign:
+            lessons = AstrologicalKnowledge.SIGN_DESCRIPTIONS.get(sat_sign, {}).get("life_lessons") or []
+            edge = ", ".join(lessons[:3]) if lessons else "discipline through that sign's craft"
+            lines.append(f"Saturn/{sat_sign} growth edge: {edge}.")
+        if sun_sign and moon_sign and sun_sign != moon_sign:
+            lines.append(
+                f"Integrate solar {sun_sign} will with lunar {moon_sign} needs — schedule both ambition and replenishment."
+            )
+        if asc_sign and sun_sign and asc_sign != sun_sign:
+            lines.append(
+                f"Others meet {asc_sign} first; your {sun_sign} core unfolds on a longer fuse — let trust earn depth."
+            )
+        lines.append(
+            f"\nDaily practice idea for {who}: one act that feeds the Sun, one that soothes the Moon, "
+            f"one honest Mercury conversation."
+        )
+
+        lines.append("\n" + "=" * 80)
+        lines.append("END DETAILED HOROSCOPE")
+        lines.append("=" * 80)
         return "\n".join(lines)
 
